@@ -1,14 +1,16 @@
 import requests
 
-# The URL of the endpoint to which you want to send data
-
-url = 'https://cyclusnv.nl/adressen/2861XH:10'
-
 #The data to be sent in the GET request
 data = {
     'postcode': '2861XH',
     'huisnummer': '10'         
 }
+
+# The URL of the endpoint to which you want to send data
+main_url = 'https://cyclusnv.nl'
+url = main_url + '/adressen/' + data["postcode"] +":"+ data["huisnummer"]
+
+
 
 # Send request GET
 # response = requests.get(url, data=data)
