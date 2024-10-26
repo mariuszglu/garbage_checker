@@ -7,7 +7,7 @@ main_url = 'https://cyclusnv.nl'
 #The data to be sent in the GET request
 data = {
     'postcode': '2861XH',
-    'huisnummer': '10'         
+    'housenumber': '10'       
 }
 # function to request api and get content json
 def get_content_json(url):
@@ -22,14 +22,15 @@ def get_content_json(url):
 
 
 
-info_location = get_content_json(main_url + '/adressen/' + data["postcode"] +":"+ data["huisnummer"])
+info_location = get_content_json(main_url + '/adressen/' + data["postcode"] +":"+ data["housenumber"])
 
 
 bag_id = info_location[0]['bagid'] # we need id Basisregistratie Adressen en Gebouwen (BAG) to next request
+print(bag_id)
 # content info about garbage flows
 content_waste_flows = get_content_json(main_url + '/rest/adressen/' + bag_id +"/afvalstromen")
 
-
+#create object list with date and name garbage
 garbage_collection_date = []
 for deadline_list in content_waste_flows:
     if deadline_list['ophaaldatum'] != None:
