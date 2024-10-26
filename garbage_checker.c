@@ -14,7 +14,7 @@ typedef struct{
 
 int main(void) {
  
-    //Tworzenie instancji struktury Address
+    //Creating an instance of the Address structure
     Adres address;
     
 
