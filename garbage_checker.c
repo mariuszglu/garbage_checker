@@ -3,6 +3,15 @@
 #include <curl/curl.h>
 #include <cjson/cJSON.h>
 
+
+// Structure to store responses with the server
+struct MemoryStruct {
+    char *memory;
+    size_t size;
+};
+
+
+
 //Structure definition
 typedef struct{
     char postcode[10]; //We use the character table for the postal code
@@ -12,22 +21,27 @@ typedef struct{
 } Adres;
 
 
+//Structure garbage collection date
+typedef struct{
+    char date[15];
+    char name_garbage[30];
+}Garbage;
+
+
+
 int main(void) {
  
     //Creating an instance of the Address structure
     Adres address;
-    
-
     strcpy(address.postcode, "2867CG");
     strcpy(address.housenumber, "8");
     strcpy(address.main_url, "https://cyclusnv.nl");
 
 
-    //Displaying content
-    printf("Postcode: %s\n", address.postcode);
-    printf("Number house: %s\n", address.postcode);
-    printf("URL: %s\n", address.main_url);
-   
+
+
+
+
 
     return 0;
 }
