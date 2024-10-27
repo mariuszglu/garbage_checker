@@ -6,8 +6,8 @@
 
 // Structure to store responses with the server
 struct MemoryStruct {
-    char *memory;
-    size_t size;
+    char *memory;   // Pointer to the buffer storing the response
+    size_t size;    // Current size of data in buffer
 };
 
 typedef struct {
@@ -35,6 +35,32 @@ typedef struct{
 
 
 
+
+// Function to save the response in a structure
+static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
+    size_t realsize = size * nmemb; // We calculate the actual size of the data portion
+    struct MemoryStruct *mem = (struct MemoryStruct *)userp; // We calculate the actual size of the data portion
+
+// Dynamically expand buffer to accommodate new data
+    mem->memory = realloc(mem->memory, mem->size + realsize + 1);
+    if (mem->memory == NULL) { // We check if memory allocation was successful
+        printf("Cannot allocate memory!\n");
+        return 0;
+    }
+
+// We copy a new portion of data to the buffer
+    memcpy(&(mem->memory[mem->size]), contents, realsize); 
+    mem->size += realsize; // We update the data size
+    mem->memory[mem->size] = '\0'; // End buffer with '\0'
+
+    return realsize;
+}
+
+
+
+
+
+
 int main(void) {
  
     //Creating an instance of the Address structure
@@ -43,6 +69,8 @@ int main(void) {
     strcpy(address.postcode, "2867CG");
     strcpy(address.housenumber, "8");
     urls.main_url ="https://cyclusnv.nl";
+
+
 
     return 0;
 }
