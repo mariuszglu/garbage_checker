@@ -24,9 +24,7 @@ def get_content_json(url):
 
 info_location = get_content_json(main_url + '/adressen/' + data["postcode"] +":"+ data["housenumber"])
 
-
 bag_id = info_location[0]['bagid'] # we need id Basisregistratie Adressen en Gebouwen (BAG) to next request
-print(bag_id)
 # content info about garbage flows
 content_waste_flows = get_content_json(main_url + '/rest/adressen/' + bag_id +"/afvalstromen")
 
