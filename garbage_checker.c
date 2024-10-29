@@ -97,6 +97,38 @@ char* send_get_request(const char *url) {
 
 
 
+/*
+Function we need to extract data like bag_id (Basisregistratie Adressen en Gebouwen (BAG)) and
+garbage collection date, name_garbage
+*/
+void extract_data_from_JSON(const char *json_content, char *bagid_buffer, size_t buffer_size) {
+   // Parsing the entire JSON response
+    cJSON *json_array = cJSON_Parse(json_content);
+    if (json_array == NULL) {
+        printf("JSON parsing error!!.\n");
+        return;
+    }else
+    {
+        printf("JSON parsing OK!!.\n");
+    }
+    
+
+// Checking if we are dealing with a JSON array
+    if (!cJSON_IsArray(json_array)) {
+        printf("JSON is not an array!!.\n");
+        cJSON_Delete(json_array);
+        return;
+    }else
+    {
+        printf("JSON is an array!!.\n");
+    }
+    cJSON_Delete(json_array); // Freeing up memory
+}
+
+
+
+
+
 
 int main(void) {
  
@@ -108,21 +140,22 @@ int main(void) {
     urls.main_url ="https://cyclusnv.nl";
     urls.str_adres = "/adressen/";
 
-
+    //first URL example https://cyclusnv.nl/adressen/2861XC:10
     sprintf(urls.url1,"%s%s%s:%s",urls.main_url, urls.str_adres, address.postcode, address.housenumber);
     printf("%s\n",urls.url1);
 
+    //in the first query we will receive JSON containing the bag_id
     char *response1 = send_get_request(urls.url1);
     
     if(response1 != NULL){
         printf("Response from server: %s\n", response1);
+
+        extract_data_from_JSON(response1, address.bag_id, sizeof(address.bag_id));
         free(response1);
     }else
     {
         printf("empty response");
     }
-    
-    printf("End program\n"); 
-
+    printf("End program!!\n"); 
     return 0;
 }
