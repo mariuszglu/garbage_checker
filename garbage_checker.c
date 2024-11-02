@@ -34,6 +34,7 @@ typedef struct
     char date[15];
     char name_garbage[30];
     int index; // index in garbage_array
+    int size;  // size garbage_array
 } Garbage;
 // We create an array of 5 Garbage type elements
 Garbage garbage_array[5];
@@ -135,9 +136,7 @@ void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *g
 
     int index = 0;
     for (int i = 0; i < array_size; i++)
-
     {
-
         cJSON *item = cJSON_GetArrayItem(json_array, i);
         cJSON *bagid = cJSON_GetObjectItem(item, "bagid");
         cJSON *ophaaldatum = cJSON_GetObjectItem(item, "ophaaldatum");
@@ -146,28 +145,41 @@ void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *g
         if (cJSON_IsString(bagid) && (bagid->valuestring != NULL))
         {
             strncpy(address->bag_id, bagid->valuestring, sizeof(address->bag_id) - 1);
-            // snprintf(address->bag_id, sizeof(address->bag_id), bagid->valuestring, i + 1);
-            address->bag_id[sizeof(address->bag_id) - 1] = '\0';
+            // address->bag_id[sizeof(address->bag_id) - 1] = '\0';
         }
 
         if (cJSON_IsString(ophaaldatum) && (ophaaldatum->valuestring != NULL))
         {
             strncpy(garbage_array[garbage->index].date, ophaaldatum->valuestring, sizeof(garbage_array[garbage->index].date) - 1);
             strncpy(garbage_array[garbage->index].name_garbage, title->valuestring, sizeof(garbage_array[garbage->index].name_garbage) - 1);
+
             garbage->index++;
         }
     }
     cJSON_Delete(json_array); // Freeing up memory
 }
 
+// Comparison function for qsort
+int compare_by_date(const void *a, const void *b)
+{
+    Garbage *garbageA = (Garbage *)a;
+    Garbage *garbageB = (Garbage *)b;
+    return strcmp(garbageA->date, garbageB->date);
+}
+
+// Function to sort the global array - garbage_array
+void sort_garbage_array(int length)
+{
+    qsort(garbage_array, length, sizeof(Garbage), compare_by_date);
+}
+
 int main(void)
 {
 
-    // Creating an instance of the Address structure
+    // Creating an instance of the Address, URL_data, Garbage structure
     Adres address = {};
     URL_data urls;
     Garbage garbage = {};
-    // Garbage g_array[5];
     strcpy(address.postcode, "2861XC");
     strcpy(address.housenumber, "10");
     urls.main_url = "https://cyclusnv.nl";
@@ -187,13 +199,10 @@ int main(void)
     }
     else
     {
-        printf("empty response");
+        printf("Empty response");
     }
 
-    // main_url + '/rest/adressen/' + bag_id +"/afvalstromen"
     // second URL https://cyclusnv.nl/rest/adressen/0513200000005956/afvalstromen
-    // https://cyclusnv.nl/rest/adressen/0491200001323024/afvalstromen
-
     sprintf(urls.url2, "%s/rest%s%s/afvalstromen", urls.main_url, urls.str_adres, address.bag_id);
     printf("%s\n", urls.url2);
 
@@ -209,12 +218,16 @@ int main(void)
     {
         printf("Empty response");
     }
-    int length = sizeof(garbage_array) / sizeof(garbage_array[0]);
+    // length of garbage_array
+    int length = (sizeof(garbage_array) / sizeof(garbage_array[0])) - 1;
 
-    for (int i = 0; i < length - 1; i++)
+    sort_garbage_array(length);
+    printf("After sorting\n");
+    for (int i = 0; i < length; i++)
     {
         printf("Date of export: %s, Type of garbage: %s\n", garbage_array[i].date, garbage_array[i].name_garbage);
     }
+
     printf("End program!!\n");
     return 0;
 }
