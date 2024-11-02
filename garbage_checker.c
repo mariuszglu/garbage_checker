@@ -104,7 +104,6 @@ char *send_get_request(const char *url)
 Function we need to extract data like bag_id (Basisregistratie Adressen en Gebouwen (BAG)) and
 garbage collection date, name_garbage
 */
-// url_order passes two states 1 and 2 for first url and second url
 void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *garbage, Garbage garbage_array[])
 {
 
@@ -131,8 +130,9 @@ void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *g
     {
         printf("JSON is an array!!.\n");
     }
+
     int array_size = cJSON_GetArraySize(json_array);
-    printf("Tablica zawiera elementow: %d\n", array_size);
+ 
 
     int index = 0;
     for (int i = 0; i < array_size; i++)
@@ -145,7 +145,6 @@ void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *g
         if (cJSON_IsString(bagid) && (bagid->valuestring != NULL))
         {
             strncpy(address->bag_id, bagid->valuestring, sizeof(address->bag_id) - 1);
-            // address->bag_id[sizeof(address->bag_id) - 1] = '\0';
         }
 
         if (cJSON_IsString(ophaaldatum) && (ophaaldatum->valuestring != NULL))
