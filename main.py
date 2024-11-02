@@ -26,6 +26,7 @@ info_location = get_content_json(main_url + '/adressen/' + data["postcode"] +":"
 bag_id = info_location[0]['bagid'] # we need id Basisregistratie Adressen en Gebouwen (BAG) to next request
 # content info about garbage flows
 content_waste_flows = get_content_json(main_url + '/rest/adressen/' + bag_id +"/afvalstromen")
+print(main_url + '/rest/adressen/' + bag_id +"/afvalstromen");
 
 #create object list with date and name garbage
 garbage_collection_date = []
