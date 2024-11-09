@@ -100,9 +100,40 @@ char *send_get_request(const char *url)
     return chunk.memory; // We return the response as text (JSON format)
 }
 
+const char *translate_nl_to_en(const char *nl)
+
+{
+    if (nl == NULL)
+    {
+        return "NULL input"; // Error handling: NULL
+    }
+    else if (strcmp(nl, "Restafval") == 0)
+    {
+        return "Residual waste";
+    }
+    else if (strcmp(nl, "Plastic, metaal en drankenkartons") == 0)
+
+    {
+        return "Plastic, metal";
+    }
+    else if (strcmp(nl, "Groente-, fruit- en tuinafval") == 0)
+    {
+        return "Vegetable, fruit";
+    }
+    else if (strcmp(nl, "Oud papier & karton.") == 0)
+    {
+        return "Old paper & cardboard";
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 /*
 Function we need to extract data like bag_id (Basisregistratie Adressen en Gebouwen (BAG)) and
 garbage collection date, name_garbage
+
 */
 void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *garbage, Garbage garbage_array[])
 {
@@ -132,7 +163,6 @@ void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *g
     }
 
     int array_size = cJSON_GetArraySize(json_array);
- 
 
     int index = 0;
     for (int i = 0; i < array_size; i++)
@@ -148,9 +178,11 @@ void extract_data_from_JSON(const char *json_content, Adres *address, Garbage *g
         }
 
         if (cJSON_IsString(ophaaldatum) && (ophaaldatum->valuestring != NULL))
+
         {
+
             strncpy(garbage_array[garbage->index].date, ophaaldatum->valuestring, sizeof(garbage_array[garbage->index].date) - 1);
-            strncpy(garbage_array[garbage->index].name_garbage, title->valuestring, sizeof(garbage_array[garbage->index].name_garbage) - 1);
+            strncpy(garbage_array[garbage->index].name_garbage, translate_nl_to_en(title->valuestring), sizeof(garbage_array[garbage->index].name_garbage) - 1);
 
             garbage->index++;
         }
@@ -166,7 +198,7 @@ int compare_by_date(const void *a, const void *b)
     return strcmp(garbageA->date, garbageB->date);
 }
 
-// Function to sort the global array - garbage_array
+// Function to sort the global array - garbage_array, sorting the array by date, ascending
 void sort_garbage_array(int length)
 {
     qsort(garbage_array, length, sizeof(Garbage), compare_by_date);
@@ -221,7 +253,6 @@ int main(void)
     int length = (sizeof(garbage_array) / sizeof(garbage_array[0])) - 1;
 
     sort_garbage_array(length);
-    printf("After sorting\n");
     for (int i = 0; i < length; i++)
     {
         printf("Date of export: %s, Type of garbage: %s\n", garbage_array[i].date, garbage_array[i].name_garbage);
